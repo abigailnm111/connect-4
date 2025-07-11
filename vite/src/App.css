@@ -1,0 +1,41 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+  height:1000px;
+}
+
+
+.spot{
+  height: 100px;
+  width:100px;
+  outline: auto;
+  display: inline-block;
+}
+
+.row{
+  height:100px;
+  width: 1000px;
+}
+
+.board{
+  height:1000px;
+  width: 1000px;
+  
+}
+.winner{
+  display:block;
+  height:100px;
+  color:blue;
+  font-size: large;
+  
+}
+#empty{
+  background-color:white;
+}
+#red{
+  background-color:red;
+}
+#black{
+  background-color:black;
+}

@@ -1,0 +1,129 @@
+import { useState } from 'react'
+
+import './App.css'
+
+const SpotStatus={
+  "RED":1,
+  "BLACK":2,
+  "EMPTY":0
+}
+
+
+
+function Board() {
+
+  const initialBoard=[];
+  for(let i=0; i<6; i++){
+    let row=[]
+    for(let j=0; j<7; j++){
+      row.push(SpotStatus.EMPTY)
+    }
+    initialBoard.push(row)
+  }
+  const[board, setBoard]= useState(initialBoard);
+  const [blackTurn, setBlackTurn]= useState(true)
+  const [winner, setWinner]= useState(false);
+
+  function checkWinner(filledSpot:number[]){
+    const colorToCheck= blackTurn?SpotStatus.BLACK: SpotStatus.RED;
+    let hOptions=0;
+    let vOptions=0;
+    let rdOptions=0;
+    let ldOptions=0;
+    let [r, c]= filledSpot
+
+    for(let i=c; i<6; i++){
+      if(board[r][i]=== colorToCheck) {hOptions++
+      }else{break;};
+    }
+    for(let i=c-1; i>=0; i--){
+      if(board[r][i]=== colorToCheck) {hOptions++}else{break;};
+    }
+    if(hOptions===4) return setWinner(true);
+
+
+    for(let i=r; i<6; i++){
+      console.log(i,c)
+      if(board[i][c]=== colorToCheck) {vOptions++}else{break;};
+    }
+    if(vOptions===4) return setWinner(true);
+    
+    
+  for(let i=0; i+r<6 && c+i<7; i++){
+    if(board[r+i][c+i]=== colorToCheck) {rdOptions++}else{break;};
+  }
+  for(let i=1; r-i>=0 && c+i>=0; i++){
+    if(board[r-i][c-i]=== colorToCheck) {rdOptions++}else{break;};
+
+  }
+  if(rdOptions===4) return setWinner(true)
+    for(let i=0; r-i>=0 && c+i<7; i++){
+    if(board[r-i][c+i]=== colorToCheck) {ldOptions++}else{break;};
+  }
+  for(let i=1; i+r<6 && c-i>=0; i++){
+    if(board[r+i][c-i]=== colorToCheck) {ldOptions++}else{break;};
+  }
+  if (ldOptions===4){return setWinner(true)}
+  
+    }
+
+  
+
+    function handleClick(location){
+      if(winner===true) return;
+      const newSpots= board;
+      const turn= blackTurn? SpotStatus.BLACK: SpotStatus.RED
+      let i=5;
+      let filled=0;
+      let filledSpot=null;
+      if(board[0][location]!== SpotStatus.EMPTY) return;
+      while( i>=0 && filled===0){
+        if(board[i][location]===SpotStatus.EMPTY){
+          newSpots[i][location]=turn;
+          filled++
+          filledSpot=[i,location]
+        }
+        i--
+      }
+    if(filledSpot !== null) checkWinner(filledSpot);
+    console.log(winner)
+    setBlackTurn(!blackTurn)
+    setBoard(newSpots);
+  }
+
+  function Square({ location, value, handleClick }){
+    let colorValue="empty";
+    if(value=== SpotStatus.BLACK) {colorValue="black"}else if(value=== SpotStatus.RED){colorValue="red"}
+
+  return <span id={colorValue} className={"spot"}onClick={()=>handleClick( location)} >{value}</span>
+  }
+
+
+  return (
+  
+  <div className={'board'}>
+    <div>{winner&& <span className='winner'>{blackTurn?"Black":"Red"} is the Winner!</span>}</div>
+  {board.map((row, i)=> {
+    return <div className="row" key={i}>
+      {row.map((spot, i)=>{
+        return <Square key={i} location={i} value={spot} handleClick={handleClick}/>}
+      )
+      }
+      </div> }
+      )
+  }
+
+</div>
+  );
+}
+
+function App() {
+
+
+  return (<>
+<Board/>
+</>
+  );
+}
+
+export default App
