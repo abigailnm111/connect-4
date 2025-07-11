@@ -39,14 +39,13 @@ function Board() {
     for(let i=c-1; i>=0; i--){
       if(board[r][i]=== colorToCheck) {hOptions++}else{break;};
     }
-    if(hOptions===4) return setWinner(true);
+    if(hOptions===4) {return true}
 
 
     for(let i=r; i<6; i++){
-      console.log(i,c)
       if(board[i][c]=== colorToCheck) {vOptions++}else{break;};
     }
-    if(vOptions===4) return setWinner(true);
+    if(vOptions===4) {return true}
     
     
   for(let i=0; i+r<6 && c+i<7; i++){
@@ -56,15 +55,15 @@ function Board() {
     if(board[r-i][c-i]=== colorToCheck) {rdOptions++}else{break;};
 
   }
-  if(rdOptions===4) return setWinner(true)
+  if(rdOptions===4) {return true}
     for(let i=0; r-i>=0 && c+i<7; i++){
     if(board[r-i][c+i]=== colorToCheck) {ldOptions++}else{break;};
   }
   for(let i=1; i+r<6 && c-i>=0; i++){
     if(board[r+i][c-i]=== colorToCheck) {ldOptions++}else{break;};
   }
-  if (ldOptions===4){return setWinner(true)}
-  
+  if (ldOptions===4){return true}
+  return false;
     }
 
   
@@ -72,7 +71,7 @@ function Board() {
     function handleClick(location){
       if(winner===true) return;
       const newSpots= board;
-      const turn= blackTurn? SpotStatus.BLACK: SpotStatus.RED
+      const turn= blackTurn===true? SpotStatus.BLACK: SpotStatus.RED
       let i=5;
       let filled=0;
       let filledSpot=null;
@@ -85,9 +84,10 @@ function Board() {
         }
         i--
       }
-    if(filledSpot !== null) checkWinner(filledSpot);
-    console.log(winner)
-    setBlackTurn(!blackTurn)
+    if(filledSpot === null) return;
+    const tempWinner=checkWinner(filledSpot)
+    setWinner(tempWinner);
+    if(tempWinner===false) setBlackTurn(!blackTurn)
     setBoard(newSpots);
   }
 
@@ -95,7 +95,7 @@ function Board() {
     let colorValue="empty";
     if(value=== SpotStatus.BLACK) {colorValue="black"}else if(value=== SpotStatus.RED){colorValue="red"}
 
-  return <span id={colorValue} className={"spot"}onClick={()=>handleClick( location)} >{value}</span>
+  return <span id={colorValue} className={"spot"}onClick={()=>handleClick( location)} ></span>
   }
 
 
