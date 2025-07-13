@@ -8,22 +8,20 @@ const SpotStatus={
   "EMPTY":0
 }
 
-
-
 function Board() {
 
-  const initialBoard=[];
-  for(let i=0; i<6; i++){
-    let row=[]
-    for(let j=0; j<7; j++){
-      row.push(SpotStatus.EMPTY)
-    }
-    initialBoard.push(row)
-  }
-  const[board, setBoard]= useState(initialBoard);
+  
+  const[board, setBoard]= useState(null);
+  const [player, setPlayer]= useState(null)
   const [blackTurn, setBlackTurn]= useState(true)
   const [winner, setWinner]= useState(false);
 
+
+  if(board ===null){
+    fetch('http://localhost:3000/getInitialBoard')
+      .then(response => response.json())
+      .then(json =>  { setBoard(json.board); setPlayer(json.playerId); })
+      .catch(error => console.error(error));}
   function checkWinner(filledSpot:number[]){
     const colorToCheck= blackTurn?SpotStatus.BLACK: SpotStatus.RED;
     let hOptions=0;
@@ -70,25 +68,14 @@ function Board() {
 
     function handleClick(location){
       if(winner===true) return;
-      const newSpots= board;
-      const turn= blackTurn===true? SpotStatus.BLACK: SpotStatus.RED
-      let i=5;
-      let filled=0;
-      let filledSpot=null;
-      if(board[0][location]!== SpotStatus.EMPTY) return;
-      while( i>=0 && filled===0){
-        if(board[i][location]===SpotStatus.EMPTY){
-          newSpots[i][location]=turn;
-          filled++
-          filledSpot=[i,location]
-        }
-        i--
-      }
-    if(filledSpot === null) return;
-    const tempWinner=checkWinner(filledSpot)
-    setWinner(tempWinner);
-    if(tempWinner===false) setBlackTurn(!blackTurn)
-    setBoard(newSpots);
+    fetch('http://localhost:3000/takeTurn', {method: "POST", body:JSON.stringify({location, player})})
+      .then(response => response.json())
+      .then(json =>  { 
+        setBoard(json.newSpots); 
+        setWinner(json.winner); 
+        setBlackTurn(json.nextTurn)
+        })
+      .catch(error => console.error(error));
   }
 
   function Square({ location, value, handleClick }){
@@ -98,12 +85,11 @@ function Board() {
   return <span id={colorValue} className={"spot"}onClick={()=>handleClick( location)} ></span>
   }
 
-
   return (
   
   <div className={'board'}>
     <div>{winner&& <span className='winner'>{blackTurn?"Black":"Red"} is the Winner!</span>}</div>
-  {board.map((row, i)=> {
+  {board &&board.map((row, i)=> {
     return <div className="row" key={i}>
       {row.map((spot, i)=>{
         return <Square key={i} location={i} value={spot} handleClick={handleClick}/>}
